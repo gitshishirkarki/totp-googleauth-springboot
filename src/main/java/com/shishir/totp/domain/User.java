@@ -17,11 +17,11 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @Column(name = "two_factor_enabled", nullable = false)
-    private boolean twoFactorEnabled;
+    @Column(name = "mfa_enabled", nullable = false)
+    private boolean mfaEnabled;
 
-    @Column(name = "two_factor_secret")
-    private String twoFactorSecret;
+    @Column(name = "mfa_secret")
+    private String mfaSecret;
 
     // Getters and Setters
 
@@ -49,20 +49,20 @@ public class User {
         this.password = password;
     }
 
-    public boolean isTwoFactorEnabled() {
-        return twoFactorEnabled;
+    public boolean isMfaEnabled() {
+        return mfaEnabled;
     }
 
-    public void setTwoFactorEnabled(boolean twoFactorEnabled) {
-        this.twoFactorEnabled = twoFactorEnabled;
+    public void setMfaEnabled(boolean mfaEnabled) {
+        this.mfaEnabled = mfaEnabled;
     }
 
-    public String getTwoFactorSecret() {
-        return twoFactorSecret;
+    public String getMfaSecret() {
+        return mfaSecret;
     }
 
-    public void setTwoFactorSecret(String twoFactorSecret) {
-        this.twoFactorSecret = twoFactorSecret;
+    public void setMfaSecret(String mfaSecret) {
+        this.mfaSecret = mfaSecret;
     }
 }
 
