@@ -1,6 +1,7 @@
 package com.shishir.totp.service;
 
 import com.shishir.totp.domain.User;
+import com.shishir.totp.googleauthentication.GAService;
 import com.shishir.totp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,12 +16,20 @@ public class AuthService {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+    @Autowired
+    private GAService gaService;
+
     public User register(String username, String password, boolean twoFactorEnabled, String twoFactorSecret) {
         User user = new User();
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode(password));
         user.setTwoFactorEnabled(twoFactorEnabled);
         user.setTwoFactorSecret(twoFactorSecret);
+
+        if (twoFactorEnabled) {
+            user.setTwoFactorSecret(gaService.generateKey());
+        }
+
         return userRepository.save(user);
     }
 
@@ -32,13 +41,21 @@ public class AuthService {
         return null;
     }
 
-    public boolean verifyTwoFactorCode(User user, String code) {
-        // In a real implementation, use a library like Google Authenticator to verify the 2FA code
-        // This is a placeholder for demo purposes
-        return true;
+    public boolean verifyTwoFactorCode(String username, int code) {
+        User user = this.findByUsername(username);
+        return user != null && gaService.isValid(user.getTwoFactorSecret(), code);
     }
 
-    public User findByUsername(String username){
+    public String generateQR(String username) {
+        User user = this.findByUsername(username);
+        if (user != null) {
+            return gaService.generateQRUrl(user.getTwoFactorSecret(), username);
+        }
+
+        return null;
+    }
+
+    public User findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 }

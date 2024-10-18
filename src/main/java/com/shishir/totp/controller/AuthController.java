@@ -1,6 +1,7 @@
 package com.shishir.totp.controller;
 
 import com.shishir.totp.domain.User;
+import com.shishir.totp.googleauthentication.GAService;
 import com.shishir.totp.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,8 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
+    @Autowired
+    private GAService gaService;
 
     @PostMapping("/register")
     public User register(@RequestParam String username,
@@ -28,12 +31,14 @@ public class AuthController {
 
     @PostMapping("/verify")
     public boolean verifyTwoFactor(@RequestParam String username,
-                                   @RequestParam String code) {
+                                   @RequestParam int code) {
         User user = authService.findByUsername(username);
-        if (user != null) {
-            return authService.verifyTwoFactorCode(user, code);
-        }
-        return false;
+        return user != null && gaService.isValid(user.getTwoFactorSecret(), code);
+    }
+
+    @GetMapping("qr/generate")
+    public String generateQR(@RequestParam String username) {
+        return authService.generateQR(username);
     }
 }
 
