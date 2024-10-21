@@ -16,6 +16,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Disable CSRF protection
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll() // Allow access to authentication endpoints
+                        .requestMatchers("/h2-console/**").permitAll() // Allow access to h2-database endpoints
                         .anyRequest().authenticated()); // All other requests need authentication
 
         return http.build();
