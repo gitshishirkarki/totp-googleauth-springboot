@@ -12,11 +12,7 @@ import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import com.warrenstrange.googleauth.GoogleAuthenticatorQRGenerator;
 import org.springframework.stereotype.Service;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,33 +36,25 @@ public class GAService {
     }
 
     // Generate a QR code URL for Google Authenticator
-    public String generateQRUrl(String secret, String username) {
+    public BufferedImage generateQRImage(String secret, String username) {
         String url = GoogleAuthenticatorQRGenerator.getOtpAuthTotpURL(
                 ISSUER,
                 username,
                 new GoogleAuthenticatorKey.Builder(secret).build());
-        try {
-            return generateQRBase64(url);
-        } catch (Exception e) {
-            return null;
-        }
+        return generateQRImage(url);
     }
 
     // Generate a QR code image in Base64 format
-    public static String generateQRBase64(String qrCodeText) {
+    public static BufferedImage generateQRImage(String qrCodeText) {
         try {
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
             Map<EncodeHintType, Object> hintMap = new HashMap<>();
             hintMap.put(EncodeHintType.CHARACTER_SET, "UTF-8");
 
             BitMatrix bitMatrix = qrCodeWriter.encode(qrCodeText, BarcodeFormat.QR_CODE, 200, 200, hintMap);
-            BufferedImage bufferedImage = MatrixToImageWriter.toBufferedImage(bitMatrix);
+            return MatrixToImageWriter.toBufferedImage(bitMatrix);
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(bufferedImage, "png", baos);
-            byte[] imageBytes = baos.toByteArray();
-            return Base64.getEncoder().encodeToString(imageBytes);
-        } catch (WriterException | IOException e) {
+        } catch (WriterException e) {
             e.printStackTrace();
             return null;
         }

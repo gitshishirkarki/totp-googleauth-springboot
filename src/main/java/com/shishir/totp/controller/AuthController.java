@@ -6,9 +6,16 @@ import com.shishir.totp.dto.MfaVerificationResponse;
 import com.shishir.totp.dto.RegisterRequest;
 import com.shishir.totp.dto.VerifyTotpRequest;
 import com.shishir.totp.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.OutputStream;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -29,8 +36,20 @@ public class AuthController {
     }
 
     @GetMapping("qr/generate")
-    public ResponseEntity<?> generateQR(@RequestParam String username) {
-        return ResponseEntity.ok(userService.generateTotpQR(username));
+    public void generateQR(@RequestParam String username, HttpServletResponse response) {
+        BufferedImage qrImage = userService.generateTotpQR(username);
+        if (qrImage != null) {
+            try {
+                response.setContentType(MediaType.IMAGE_PNG_VALUE);
+                OutputStream outputStream = response.getOutputStream();
+                ImageIO.write(qrImage, "png", outputStream);
+                outputStream.flush();
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
 
     @PostMapping("/login")

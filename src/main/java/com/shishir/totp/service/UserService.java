@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.awt.image.BufferedImage;
+
 @Service
 public class UserService {
 
@@ -41,13 +43,9 @@ public class UserService {
         return user != null && gaService.isValid(user.getMfaSecret(), code);
     }
 
-    public String generateTotpQR(String username) {
+    public BufferedImage generateTotpQR(String username) {
         User user = this.findByUsername(username);
-        if (user != null) {
-            return gaService.generateQRUrl(user.getMfaSecret(), username);
-        }
-
-        return "";
+        return gaService.generateQRImage(user.getMfaSecret(), username);
     }
 
     public User findByUsername(String username) {
