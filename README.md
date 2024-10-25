@@ -15,8 +15,6 @@ This Spring Boot-based project implements Two-Factor Authentication (TOTP) using
 
 ![TotpQR](totpqr.png)
 
-![TotpQRToImage](totpqrtoimage.png)
-
 3. **User Login**:
     - Authenticates the user with their username and password, and checks if MFA is required.
 
